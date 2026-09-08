@@ -7,8 +7,7 @@
  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 
 
- <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-  <style>:root {
+ <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">  <style>:root {
     --bg:#DAD3C5; --fg:#2A2A28; --muted:#8B8579; --card:#F0ECE3;
     --accent:#2B4C7E; --accent2:#B5482F; --border:#A99F8E; --ok:#4C6B3C; --warn:#B5482F;
   }
@@ -33,8 +32,8 @@
   
   /* ---- Title block header ---- */
   .titleblock { border-top: 3px double var(--fg); border-bottom: 1.5px solid var(--fg); background: var(--bg); }
-  .titleblock-inner { max-width: 1000px; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
-  #hello.titleblock-name { font-family: "Caveat", cursive; font-size: 26px; font-weight: 600; color: var(--fg) !important; }
+  .titleblock-inner { max-width: none; margin: 0 auto; padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+  #hello.titleblock-name { font-family: "Newsreader", serif; font-size: 19px; font-weight: 600; color: var(--fg) !important; }
   .titleblock-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
   
   /* ---- Sheet layout (no boxed dashboard panels) ---- */
@@ -50,13 +49,16 @@
     counter-increment: zone;
   }
   .card:first-of-type { border-top: none; padding-top: 0; }
-  .card::before {
-    content: counter(zone, decimal-leading-zero);
-    position: absolute; left: 0; top: 40px;
-    font-family: "Space Grotesk", sans-serif; font-size: 34px; font-weight: 700; color: var(--border);
-  }
-  .card:first-of-type::before { top: 0; }
-  .section-heading { font-family: "Caveat", cursive; font-size: 30px; font-weight: 600; margin: 0 0 18px; color: var(--fg); }
+  .section-heading::before {
+  content: counter(zone, decimal-leading-zero);
+  display: inline-block;
+  margin-right: 18px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 0.85em;
+  color: var(--border);
+  vertical-align: baseline;
+}  .section-heading { font-family: "Newsreader", serif; font-size: 30px; font-weight: 600; margin: 0 0 18px; color: var(--fg); }
   
   .dropzone {
     position: relative;
@@ -78,7 +80,7 @@
   .dropzone::before { top: 6px; left: 6px; border-width: 1.5px 0 0 1.5px; }
   .dropzone::after  { bottom: 6px; right: 6px; border-width: 0 1.5px 1.5px 0; }
   .dropzone.dragover { background: rgba(43,76,126,.06); }
-  .dropzone strong { font-family: "Caveat", cursive; font-size: 1.3em; font-weight: 600; color: var(--accent); }
+  .dropzone strong { font-family: "Newsreader", serif; font-size: 1.3em; font-weight: 600; color: var(--accent); }
   
   .controls-row { display: flex; gap: 10px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
   
@@ -86,26 +88,17 @@
   .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 0; }
   
   .annotation-row { display: flex; gap: 18px; align-items: flex-start; margin-top: 20px; flex-wrap: wrap; }
-  .preview {
-  position: relative;
-  width: 100%; height: 100%; min-height: 180px;
-  padding: 0;
-  display: grid; place-items: center;
+  .preview { display: none; width: 100%; }
+.dropzone.has-image .preview { display: block; }
+.dropzone.has-image .dropzone-placeholder { display: none; }.controls-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.preview:empty::before {
-  content: "";
-  position: absolute; inset: 14px;
-  background:
-    linear-gradient(to bottom right, transparent calc(50% - 1px), var(--border) calc(50% - 1px), var(--border) calc(50% + 1px), transparent calc(50% + 1px)),
-    linear-gradient(to bottom left, transparent calc(50% - 1px), var(--border) calc(50% - 1px), var(--border) calc(50% + 1px), transparent calc(50% + 1px));
+.controls-col button, .controls-col .actions, .controls-col input {
+  width: 100%;
 }
-.preview:empty::after {
-  content: "awaiting...";
-  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
-  font-family: "Caveat", cursive; font-size: 18px; color: var(--muted);
-  background: var(--card); padding: 0 8px;
-}
-  .annotation-row .actions { flex: 1; min-width: 220px; }
+.controls-col .actions { margin-top: 0; }  .annotation-row .actions { flex: 1; min-width: 220px; }
   
   input[type="text"], select, textarea {
     width: 100%; padding: 10px 12px; border-radius: 2px;
@@ -113,7 +106,7 @@
     font-family: "Space Grotesk", sans-serif; outline: none;
   }
   input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--accent); }
-  input[type="text"]::placeholder, textarea::placeholder { font-family: "Caveat", cursive; font-size: 1.1em; color: var(--muted); }
+  input[type="text"]::placeholder, textarea::placeholder { font-family: "Newsreader", serif; font-size: 1.1em; color: var(--muted); }
   
   button {
     padding: 10px 16px; border-radius: 3px; border: 1.5px solid var(--fg);
@@ -169,7 +162,7 @@
   }
   .result img { margin-bottom: 0; }
 .caption {
-  font-family: "Caveat", cursive;
+  font-family: "Newsreader", serif;
   font-size: 24px;
   line-height: 1.15;
   color: var(--fg);
@@ -181,7 +174,7 @@
   .veil {
     position: absolute; inset: 12px 12px 36px 12px; display: grid; place-items: center;
     border-radius: 2px; background: rgba(240,236,227,.75); color: var(--fg); font-weight: 600;
-    font-family: "Caveat", cursive; font-size: 20px;
+    font-family: "Newsreader", serif; font-size: 20px;
     border: 1.5px dashed var(--accent); cursor: pointer; user-select: none;
   }
   .veil small { display:block; font-weight:500; opacity:.9; font-family: "Space Grotesk", sans-serif; font-size: 12px; }
@@ -234,7 +227,7 @@
   .plus-card::before { content: none; }
   .plus-card:hover { border-color: var(--accent); color: var(--accent); }
   .plus-inner { text-align: center; }
-  .plus-symbol { font-size: 40px; line-height: 1; font-family: "Caveat", cursive; }
+  .plus-symbol { font-size: 40px; line-height: 1; font-family: "Newsreader", serif; }
   .plus-caption { font-size: 12px; margin-top: 4px; color: var(--muted); font-family: "Space Grotesk", sans-serif; }
   .plus-card.disabled { opacity:.5; cursor:not-allowed; }
   .plus-card.disabled:hover { border-color: var(--border); color: var(--muted); }
@@ -267,7 +260,7 @@
   .modal.open { display:flex; }
   .modal-card { background: var(--card); border:1px solid var(--border); border-radius:3px; max-width: 680px; width: 100%; padding: 18px; }
   .modal-header { display:flex; align-items:center; justify-content:space-between; }
-  .modal-title { font-family: "Caveat", cursive; font-size: 24px; font-weight: 600; color: var(--fg); }
+  .modal-title { font-family: "Newsreader", serif; font-size: 24px; font-weight: 600; color: var(--fg); }
   
   .custom-card { background: var(--bg); border:1.5px dashed var(--accent); border-radius:2px; padding:12px; display:flex; flex-direction:column; gap:10px; }
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -316,7 +309,7 @@
     width:min(850px, 95vw); color:var(--fg); align-items: center; justify-content: center;
     margin: 0 auto; border: 1px solid var(--border);
   }
-  .tutorial-card h3{ margin:0 0 0px; grid-column: 2; justify-self: center; font-family: "Caveat", cursive; }
+  .tutorial-card h3{ margin:0 0 0px; grid-column: 2; justify-self: center; font-family: "Newsreader", serif; }
   .tutorial-card ul{ margin:8px 0 0 18px; color:var(--muted); }
   .tutorial-close { margin-right:auto; border:0; background:transparent; color:var(--fg);
     font-size:22px; cursor:pointer;
@@ -359,7 +352,7 @@
   font-family: "Space Grotesk", sans-serif;
   max-height: 160px; overflow-y: auto;
 }
-  .blurb strong { color: var(--accent2); font-family: "Caveat", cursive; font-size: 1.15em; }
+  .blurb strong { color: var(--accent2); font-family: "Newsreader", serif; font-size: 1.15em; }
   
   .lightbox-body { display: flex; gap: 20px; align-items: flex-start; max-width: 95vw; max-height: 88vh; }
   .lightbox-body img { max-width: 65vw; max-height: 85vh; border-radius: 2px; display: block; }
@@ -381,7 +374,7 @@
 }
 .sticky-note strong {
   display: block;
-  font-family: "Caveat", cursive;
+  font-family: "Newsreader", serif;
   font-size: 20px;
   color: var(--accent2);
   margin-bottom: 4px;
@@ -395,7 +388,7 @@
 }
 .sticky-0 { transform: rotate(-1.4deg); }
 .sticky-1 { transform: rotate(1deg); }
-.sticky-2 { transform: rotate(-0.6deg); }  .lightbox-blurb strong { color: var(--accent2); font-family: "Caveat", cursive; }
+.sticky-2 { transform: rotate(-0.6deg); }  .lightbox-blurb strong { color: var(--accent2); font-family: "Newsreader", serif; }
   .lightbox-blurb:empty { display: none; }
   @media (max-width: 900px) {
     .lightbox-body { flex-direction: column; overflow-y: auto; }
@@ -411,33 +404,17 @@
   .remix-btn:hover { background: var(--accent2); color: var(--card); }
   
   @media (max-width: 640px) {
-    .card { padding-left: 44px; }
-    .card::before { font-size: 26px; }
-  }
+  .card { padding-left: 44px; }
+}
   .stage-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: start;
 }
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .stage-row { grid-template-columns: 1fr; }
 }
-
-.specimen-frame {
-  position: relative;
-  border: 1.5px solid var(--fg);
-  border-radius: 2px;
-  padding: 10px;
-  min-height: 200px;
-  background: var(--card);
-}
-.specimen-frame::before, .specimen-frame::after {
-  content: ""; position: absolute; width: 14px; height: 14px;
-  border-color: var(--accent2); border-style: solid; opacity: .75;
-}
-.specimen-frame::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-.specimen-frame::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 
 .card:nth-of-type(2) {
   max-width: 1400px;
@@ -495,31 +472,33 @@
       <h2 class="section-heading">Present your work</h2>
     
       <div class="stage-row">
-        <div id="dropzone" class="dropzone">
-          <strong>Drag &amp; Drop</strong> your image here<br/>
-          <span class="muted">or click to browse</span>
-          <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+        <div class="specimen-col">
+          <div id="dropzone" class="dropzone">
+            <div class="dropzone-placeholder">
+              <strong>Drag &amp; Drop</strong> your image here<br/>
+              <span class="muted">or click to browse</span>
+            </div>
+            <div class="preview" id="preview"></div>
+            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+          </div>
+    
+          <div class="progress-wrap" id="pwrap"><div class="progress-bar" id="pbar"></div></div>
+          <div class="progress-meta" id="pmeta">
+            <span id="ptext">Preparing…</span><span id="eta" style="float:right;"></span>
+          </div>
         </div>
     
-        <div class="specimen-frame">
-          <div class="preview" id="preview"></div>
+        <div class="controls-col">
+          <button id="openCameraBtn" class="btn ghost" type="button">Take a photo</button>
+          <button id="resetImageBtn" class="btn ghost" type="button">Reset image</button>
+          <div class="actions">
+            <input id="extraPrompt" type="text" placeholder="(Optional) extra instructions / themes"/>
+          </div>
+          <button id="runBtn" disabled>
+            <span class="btn ghost" style="display:none" id="spin"></span>
+            Generate!
+          </button>
         </div>
-      </div>
-    
-      <div class="progress-wrap" id="pwrap"><div class="progress-bar" id="pbar"></div></div>
-      <div class="progress-meta" id="pmeta">
-        <span id="ptext">Preparing…</span><span id="eta" style="float:right;"></span>
-      </div>
-      
-      <div class="controls-and-prompt">
-        <button id="openCameraBtn" class="btn ghost" type="button">Take a photo</button>
-        <div class="actions">
-          <input id="extraPrompt" style="background: var(--bg); " type="text" placeholder="(Optional) extra instructions / themes"/>
-        </div>
-        <button id="runBtn" disabled>
-          <span class="btn ghost" style="display:none" id="spin"></span>
-          Generate!
-        </button>
       </div>
     </section>
   
@@ -836,6 +815,7 @@ const camCaptureBtn = document.getElementById('camCaptureBtn');
 const camRetakeBtn  = document.getElementById('camRetakeBtn');
 const camUseBtn     = document.getElementById('camUseBtn');
 const camError      = document.getElementById('camError');
+const resetImageBtn = document.getElementById('resetImageBtn');
 
 
 let camStream = null;
@@ -843,6 +823,16 @@ let camBlob   = null;
 
 
 // Helpers
+function resetImage(){
+  file = null;
+  fi.value = '';
+  preview.innerHTML = '';
+  dz.classList.remove('has-image');
+  runBtn.disabled = true;
+  customBtn.disabled = true;
+}
+resetImageBtn.addEventListener('click', resetImage);
+
 async function uploadToDrive(dataUrl) {
   const name  = localStorage.getItem('userName');
   const blob = await (await fetch(dataUrl)).blob();
@@ -949,14 +939,12 @@ function dataTransferWithFile(file) {
 function useCapturedPhoto() {
  if (!camBlob) return;
  const fileFromCam = new File([camBlob], 'camera-photo.png', { type: 'image/png' });
- // integrate with existing pipeline
  file = fileFromCam;
  dataTransferWithFile(fileFromCam);
  showPreview(fileFromCam);
+ dz.classList.add('has-image');
  runBtn.disabled = !file;
- customBtn && (customBtn.disabled = true); // keep your gating
-
-
+ customBtn && (customBtn.disabled = true);
  closeCamModal();
 }
 
@@ -1101,25 +1089,28 @@ function uniqueBySlug(items) {
 
    dz.addEventListener('click', () => fi.click());
    fi.addEventListener('change', () => {
-     file = fi.files[0] || null;
-     showPreview(file);
-     runBtn.disabled = !file;
-     customBtn.disabled = true; // locked until all 5 revealed
-   });
+  file = fi.files[0] || null;
+  showPreview(file);
+  dz.classList.toggle('has-image', !!file);
+  runBtn.disabled = !file;
+  customBtn.disabled = true;
+});
+
 
 
    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
    dz.addEventListener('drop', (e) => {
-     e.preventDefault(); dz.classList.remove('dragover');
-     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-       file = e.dataTransfer.files[0];
-       fi.files = e.dataTransfer.files;
-       showPreview(file);
-       runBtn.disabled = !file;
-       customBtn.disabled = true;
-     }
-   });
+  e.preventDefault(); dz.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    file = e.dataTransfer.files[0];
+    fi.files = e.dataTransfer.files;
+    showPreview(file);
+    dz.classList.add('has-image');
+    runBtn.disabled = !file;
+    customBtn.disabled = true;
+  }
+});
 
 
    // progress (estimate) for the 5 presets
