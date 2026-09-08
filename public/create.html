@@ -1150,28 +1150,14 @@ function uniqueBySlug(items) {
    // Lightbox
    const lbBlurb = document.getElementById('lbBlurb');
 
-   function buildStickyNotes(summary, placement, justification) {
-  const notes = [];
-  if (summary) notes.push({ label: 'Added', text: summary });
-  if (placement) notes.push({ label: 'Where', text: placement });
-  if (justification) notes.push({ label: 'Why', text: justification });
-  return notes.map((n, i) =>
-    `<div class="sticky-note sticky-${i % 3}"><strong>${n.label}:</strong> ${n.text}</div>`
-  ).join('');
-}
 
-function openLightbox(src, blurb){
+function openLightbox(src){
   lbImg.src = src;
-  if (typeof blurb === 'string') {
-    lbBlurb.innerHTML = blurb;
-  } else if (blurb && (blurb.summary || blurb.placement || blurb.justification)) {
-    lbBlurb.innerHTML = buildStickyNotes(blurb.summary, blurb.placement, blurb.justification);
-  } else {
-    lbBlurb.innerHTML = '';
-  }
+  lbBlurb.innerHTML = '';
   lightbox.classList.add('open');
   document.body.style.overflow='hidden';
 }
+
 
 function closeLightbox(){ lightbox.classList.remove('open'); lbImg.src = ''; document.body.style.overflow=''; }
    lightbox.addEventListener('click', (e)=>{ if(e.target===lightbox) closeLightbox(); });
@@ -1294,7 +1280,7 @@ function closeLightbox(){ lightbox.classList.remove('open'); lbImg.src = ''; doc
 
 
    // --- Rendering presets with blur veil & reveal tracking ---
-   function renderLockedResult(index, dataUrl, label, blurb) {
+   function renderLockedResult(index, dataUrl, label) {
   const card = document.createElement('div');
   card.className = 'result locked';
   card.dataset.idx = String(index);
@@ -1303,7 +1289,7 @@ function closeLightbox(){ lightbox.classList.remove('open'); lbImg.src = ''; doc
   base.className = 'base';
   base.src = dataUrl;
   base.alt = label;
-  base.addEventListener('click', () => openLightbox(dataUrl, blurb));
+  base.addEventListener('click', () => openLightbox(dataUrl));
   const spotWrap = document.createElement('div');
   spotWrap.className = 'spot';
   const spotImg = document.createElement('img');
@@ -1315,9 +1301,9 @@ function closeLightbox(){ lightbox.classList.remove('open'); lbImg.src = ''; doc
   veil.className = 'veil';
   veil.innerHTML = `Click to reveal`;
   veil.addEventListener('click', () => {
-  openLightbox(dataUrl, blurb);
-  revealCard(card);
-});
+    openLightbox(dataUrl);
+    revealCard(card);
+  });
 
   card.addEventListener('mousemove', (e) => {
     if (!card.classList.contains('locked')) return;
@@ -1332,62 +1318,40 @@ function closeLightbox(){ lightbox.classList.remove('open'); lbImg.src = ''; doc
   cap.className = 'caption';
   cap.textContent = label;
 
-  // Blurb block — hidden until revealed
-  const blurbEl = document.createElement('div');
-  blurbEl.className = 'blurb hidden';
-  if (blurb && (blurb.summary || blurb.placement || blurb.justification)) {
-    blurbEl.innerHTML = `
-      ${blurb.summary ? `<div><strong>Added:</strong> ${blurb.summary}</div>` : ''}
-      ${blurb.placement ? `<div><strong>Where:</strong> ${blurb.placement}</div>` : ''}
-      ${blurb.justification ? `<div><strong>Why:</strong> ${blurb.justification}</div>` : ''}
-    `;
-  }
-
   card.appendChild(base);
   card.appendChild(spotWrap);
   card.appendChild(veil);
   card.appendChild(cap);
-  card.appendChild(blurbEl);
   const remixBtnEl = addRemixButton(card, dataUrl, label);
-remixBtnEl.classList.add('hidden');
+  remixBtnEl.classList.add('hidden');
   return card;
 }
 
 
 
 
-
 function revealCard(card) {
- const idx = Number(card.dataset.idx);
- if (revealed.has(idx)) return;
+  const idx = Number(card.dataset.idx);
+  if (revealed.has(idx)) return;
 
+  revealed.add(idx);
+  card.classList.remove('locked');
+  const remixBtnEl = card.querySelector('.remix-btn');
+  if (remixBtnEl) remixBtnEl.classList.remove('hidden');
 
- revealed.add(idx);
- card.classList.remove('locked');
- const blurbEl = card.querySelector('.blurb');
-if (blurbEl) blurbEl.classList.remove('hidden');
-const remixBtnEl = card.querySelector('.remix-btn');
-if (remixBtnEl) remixBtnEl.classList.remove('hidden');
+  const veil = card.querySelector('.veil');
+  if (veil) veil.remove();
+  const spot = card.querySelector('.spot');
+  if (spot) spot.remove();
 
+  const base = card.querySelector('img.base');
+  if (base) base.style.pointerEvents = 'auto';
 
- // permanently remove veil + spotlight layer
- const veil = card.querySelector('.veil');
- if (veil) veil.remove();
- const spot = card.querySelector('.spot');
- if (spot) spot.remove();
-
-
- // re-enable pointer events on the base image so clicks open the lightbox
- const base = card.querySelector('img.base');
- if (base) base.style.pointerEvents = 'auto';
-
-
- if (revealed.size >= totalPresets) {
-   customBtn.disabled = false;
-   ensurePlusCardAtEnd(false); // unlock +
- }
+  if (revealed.size >= totalPresets) {
+    customBtn.disabled = false;
+    ensurePlusCardAtEnd(false);
+  }
 }
-
 
 
 
@@ -1457,8 +1421,8 @@ async function runPresets() {
 
    for (const [i, item] of items.entries()) {
   const label = (item.slug || `style-${i + 1}`).replace(/-/g, ' ');
-  const card = renderLockedResult(i, item.dataUrl, label, item.blurb);
-  results.appendChild(card);
+  const card = renderLockedResult(i, item.dataUrl, label);
+    results.appendChild(card);
 
   try {
     const link = await uploadToDrive(item.dataUrl);
@@ -1634,29 +1598,19 @@ async function runCustomOnce() {
 
    const card = document.createElement('div'); card.className = 'result';
 const img = document.createElement('img'); img.src = data.result.dataUrl; img.alt = 'custom';
-img.addEventListener('click', ()=>openLightbox(data.result.dataUrl, data.result.blurb));
+img.addEventListener('click', ()=>openLightbox(data.result.dataUrl));
 const cap = document.createElement('div'); cap.className = 'caption'; cap.textContent = caption;
 
-const blurbEl = document.createElement('div');
-blurbEl.className = 'blurb';
-const b = data.result.blurb;
-if (b && (b.summary || b.placement || b.justification)) {
-  blurbEl.innerHTML = `
-    ${b.summary ? `<div><strong>Added:</strong> ${b.summary}</div>` : ''}
-    ${b.placement ? `<div><strong>Where:</strong> ${b.placement}</div>` : ''}
-    ${b.justification ? `<div><strong>Why:</strong> ${b.justification}</div>` : ''}
-  `;
-}
-
-card.appendChild(img); 
-card.appendChild(cap); 
-card.appendChild(blurbEl);
+card.appendChild(img);
+card.appendChild(cap);
 
 addRemixButton(card, data.result.dataUrl, caption);
 
 if (plus) results.insertBefore(card, plus); else results.appendChild(card);
 
-ensurePlusCardAtEnd(false);   try {
+ensurePlusCardAtEnd(false);
+
+   try  {
   const link = await uploadToDrive(data.result.dataUrl);
   // Optional: show a tiny link under the image
   const linkEl = document.createElement('div');
@@ -1765,12 +1719,11 @@ async function saveSession(originalImageLink) {
   resultCards.forEach(card => {
     const img = card.querySelector('img.base') || card.querySelector('img');
     const captionEl = card.querySelector('.caption');
-    const blurbEl = card.querySelector('.blurb');
     const entry = {
       label: captionEl ? captionEl.textContent : '',
-      link: img ? img.dataset.r2link || img.src : '',
-      blurbHtml: blurbEl ? blurbEl.innerHTML : ''
+      link: img ? img.dataset.r2link || img.src : ''
     };
+
     if (card.classList.contains('locked') || card.dataset.idx !== undefined) {
       sessionResults.push(entry);
     } else {
@@ -1852,10 +1805,9 @@ function loadSessionIntoResults(session) {
     card.innerHTML = `
       <img src="${r.link}" alt="${r.label}" />
       <div class="caption">${r.label}</div>
-      <div class="blurb">${r.blurbHtml || ''}</div>
     `;
 
-    card.querySelector('img').addEventListener('click', () => openLightbox(r.link, r.blurbHtml));
+    card.querySelector('img').addEventListener('click', () => openLightbox(r.link));
     addRemixButton(card, r.link, r.label);
     results.appendChild(card);
   });
@@ -1866,9 +1818,8 @@ function loadSessionIntoResults(session) {
     card.innerHTML = `
       <img src="${c.link}" alt="${c.label}" />
       <div class="caption">${c.label}</div>
-      <div class="blurb">${c.blurbHtml || ''}</div>
     `;
-    card.querySelector('img').addEventListener('click', () => openLightbox(c.link, c.blurbHtml));
+    card.querySelector('img').addEventListener('click', () => openLightbox(c.link));
     addRemixButton(card, c.link, c.label);
     results.appendChild(card);
   });
@@ -1879,6 +1830,7 @@ function loadSessionIntoResults(session) {
   for (let i = 0; i < session.results.length; i++) revealed.add(i);
   totalPresets = session.results.length;
 }
+
 
 const remixModal = document.getElementById('remixModal');
 const remixModalClose = document.getElementById('remixModalClose');
@@ -1946,34 +1898,23 @@ remixSubmitBtn.addEventListener('click', async () => {
     if (!resp.ok) { const err = await resp.json().catch(() => ({})); throw new Error(err.error || `HTTP ${resp.status}`); }
     const data = await resp.json();
 
-    const label = `remix of ${sourceSnapshot.label || 'result'}`;
+        const label = `remix of ${sourceSnapshot.label || 'result'}`;
     const card = document.createElement('div');
     card.className = 'result';
 
     const img = document.createElement('img');
     img.src = data.result.dataUrl;
     img.alt = label;
-    img.addEventListener('click', () => openLightbox(data.result.dataUrl, data.result.blurb));
+    img.addEventListener('click', () => openLightbox(data.result.dataUrl));
 
     const cap = document.createElement('div');
     cap.className = 'caption';
     cap.textContent = label;
 
-    const blurbEl = document.createElement('div');
-    blurbEl.className = 'blurb';
-    const b = data.result.blurb;
-    if (b && (b.summary || b.placement || b.justification)) {
-      blurbEl.innerHTML = `
-        ${b.summary ? `<div><strong>Added:</strong> ${b.summary}</div>` : ''}
-        ${b.placement ? `<div><strong>Where:</strong> ${b.placement}</div>` : ''}
-        ${b.justification ? `<div><strong>Why:</strong> ${b.justification}</div>` : ''}
-      `;
-    }
-
     card.appendChild(img);
     card.appendChild(cap);
-    card.appendChild(blurbEl);
     addRemixButton(card, data.result.dataUrl, label);
+    
 
     if (sourceSnapshot.parentCard && sourceSnapshot.parentCard.parentElement === results) {
       sourceSnapshot.parentCard.insertAdjacentElement('afterend', card);
